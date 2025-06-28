@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatAPP</title>
+    <style>
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column; 
+             /* background-image: url('/background.webp');*/
+              background-color: black
+      }
+      textarea,button{
+        display: inline;
+        font-size:15px;
+      }
+      textarea{
+        display: flex;
+        flex-wrap: wrap;
+        width: 500px;
+        height: 20px;
+        border-radius: 10px;
+        padding: 30px;
+        overflow-y: scroll;
+        scrollbar-width: none;
+        background-color: rgb(40, 40, 40);
+        color: white;
+        margin-left: 150px;
+      }
+      button{
+        width: 60px;  
+        height: 40px;      
+        border-radius: 5px;
+        background-color: blue;
+        color: white;
+        margin-left: 20px;
+      }
+   .chatroom{
+        border-radius: 10px;
+        /* background-color: white; */
+        width: 100%;
+        height: 550px;
+        overflow-y: scroll;
+        scrollbar-color: gray;   
+         scrollbar-width: none;  
+      }
+    
+      #messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  /* resize: both;
+  overflow: auto; */
+}
+.message {
+  max-width: 70%;
+  padding: 10px 15px;
+  border-radius: 10px;
+  word-wrap: break-word;
+  color: black;
+}
+
+     .sent {
+  align-self: flex-end;
+  background-color: pink;
+}
+
+.received {
+  align-self: flex-start;
+  background-color: yellow;
+}
+input[type="file"] {
+    display: none;
+}
+.file-label {
+
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  transition: background 0.3s;
+}
+
+.file-label:hover {
+  background-color: #666;
+}
+    </style>
+</head>
+<body style="background-color: black;">
+    <!-- <h1 style="color: beige;">Chatting  App</h1> -->
+    <div class="chatroom">
+        <div id="messages"></div>
+    </div>
+    <div class="box" style="display: flex; flex-direction: row; align-items: center;">
+<textarea id="message" placeholder="Type your message here..."  ></textarea>
+
+        <form  id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="senderId" id="senderId">
+            <label for="profileImage" class="file-label ">
+                <img src="submit.png" alt="📎" style="width: 30px;">
+            </label>
+        <input type="file" name="profileImage" id="profileImage" placeholder="📎">
+      </form>
+      <button  id="send" style="padding: 10px; border-radius: 5px; background-color: rgb(240, 125, 125); color: white;">Send</button>
+
+    </div>    
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+    const socket = io();
+     let myId;
+
+       const params = new URLSearchParams(window.location.search);
+       const name = params.get("name") || "Anonymous";
+
+    socket.on('connect', () => {
+      myId = socket.id;
+    });
+    const messageInput=document.getElementById('message');
+    const sendBtn=document.getElementById('send');
+    const allMessages=document.getElementById('messages');
+     socket.on('message',(message)=>{
+        const para=document.createElement('p');
+        // para.innerText=message.text+" --> "+message.id;
+        para.innerText=message.text;
+        console.log(message.id);
+        allMessages.appendChild(para);
+          para.classList.add('message');
+
+      if (message.name === name) {
+      para.classList.add('sent')
+
+    } else {
+      para.classList.add('received');
+    }
+    
+        // para.style.backgroundColor = 'rgb(214, 7, 76)';
+        para.style.color = 'black';
+        para.style.padding = '10px 15px';
+        para.style.borderRadius = '10px';
+        para.style.maxWidth = '70%';
+        para.style.wordWrap = 'break-word';
+        para.style.margin = '10px';
+     });
+     sendBtn.addEventListener("click",(e)=>{
+       const message=messageInput.value.trim();
+        if(message===""){
+            return 0;
+        }
+        console.log(message);
+
+        socket.emit('user-message',{
+          text:message,
+          name: name,
+          senderId: myId,
+     })
+        messageInput.value="";
+      })
+      //for form submission 
+  // for file upload without redirect and URL loss
+document.getElementById('profileImage').addEventListener('change', async function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('profileImage', file);
+  formData.append('senderId', myId);
+  formData.append('name', name);
+
+  try {
+    const response = await fetch('/', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) throw new Error('Upload failed');
+    console.log('File uploaded successfully');
+  } catch (err) {
+    console.error('Error uploading file:', err);
+  }
+
+  this.value = ''; // reset file input so user can re-upload the same file
+});
+
+
+
+socket.on('file', (data) => {
+  const para = document.createElement('p');
+  para.classList.add('message');
+
+  if (data.name === name) {
+    para.classList.add('sent');
+  } else {
+    para.classList.add('received');
+  }
+
+  if (/\.(jpg|jpeg|png|gif|webp)$/i.test(data.file)) {
+    const img = document.createElement('img');
+    img.src = data.file;
+    img.style.maxWidth = '200px';
+    img.style.borderRadius = '10px';
+    img.style.margin = '5px 0';
+    para.appendChild(img);
+  } else {
+    const fileLink = document.createElement('a');
+    fileLink.href = data.file;
+    fileLink.innerText = "📎 Download file";
+    fileLink.target = "_blank";
+    para.appendChild(fileLink);
+  }
+
+  allMessages.appendChild(para);
+});
+
+
+      //for message to sent through enter key
+      messageInput.addEventListener('keypress',(e)=>{
+         if(e.key==="Enter"){
+             e.preventDefault();
+            sendBtn.click();
+         }
+      })
+
+
+</script>
+</body>
+</html>

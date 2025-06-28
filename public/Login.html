@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style> body{
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 50px;
+    }
+    form{
+        display: grid;
+        justify-content: center;
+        align-items: center;
+    }
+    button{
+        margin-top: 12px;
+        width:150px;
+        height: 50px;
+    }
+    input{
+        width:300px;
+        height: 30px;
+
+    }
+</style>
+</head>
+<body>
+    <h1>Login Page</h1>
+    <form action="/login" method="POST">
+        <label >Email:</label>
+        <input type="text" name="email" placeholder="example@123.com" required>
+        <label >Password:</label>
+        <input type="password" name="password" placeholder="Enter Password" required>
+        <button type="submit">Login</button>
+        </form>
+</body>
+</html>
