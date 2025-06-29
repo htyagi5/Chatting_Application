@@ -109,6 +109,11 @@ input[type="file"] {
     </div>    
         <script src="/socket.io/socket.io.js"></script>
         <script>
+          const chatRoom = document.querySelector('.chatroom');
+          function scrollToBottom() {
+            chatRoom.scrollTop = chatRoom.scrollHeight; // Scroll to the bottom on load
+          };
+          window.onload = scrollToBottom; // Scroll to bottom when the page loads
     const socket = io();
      let myId;
 
@@ -127,6 +132,7 @@ input[type="file"] {
         para.innerText=message.text;
         console.log(message.id);
         allMessages.appendChild(para);
+        scrollToBottom(); // Scroll to the bottom when a new message is added
           para.classList.add('message');
 
       if (message.name === name) {
@@ -300,7 +306,7 @@ bubble.appendChild(preview);
 
 // === Append to chat container ===
 allMessages.appendChild(bubble);
-
+scrollToBottom(); // Scroll to the bottom when a new message is added
 });
 
 
