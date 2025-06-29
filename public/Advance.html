@@ -187,31 +187,120 @@ document.getElementById('profileImage').addEventListener('change', async functio
 
 
 socket.on('file', (data) => {
-  const para = document.createElement('p');
-  para.classList.add('message');
+  const bubble = document.createElement('div');
+  bubble.classList.add('message');
 
   if (data.name === name) {
-    para.classList.add('sent');
+    bubble.classList.add('sent');
   } else {
-    para.classList.add('received');
+    bubble.classList.add('received');
   }
 
-  if (/\.(jpg|jpeg|png|gif|webp)$/i.test(data.file)) {
-    const img = document.createElement('img');
-    img.src = data.file;
-    img.style.maxWidth = '200px';
-    img.style.borderRadius = '10px';
-    img.style.margin = '5px 0';
-    para.appendChild(img);
-  } else {
-    const fileLink = document.createElement('a');
-    fileLink.href = data.file;
-    fileLink.innerText = "📎 Download file";
-    fileLink.target = "_blank";
-    para.appendChild(fileLink);
-  }
+const fileUrl = data.file;
+const fileName = fileUrl.split('/').pop();
+const fileExt = fileName.split('.').pop().toLowerCase();
 
-  allMessages.appendChild(para);
+// === Main message wrapper ===
+bubble.style.maxWidth = '30%';
+bubble.style.margin = '8px';
+bubble.style.padding = '8px 8px';
+bubble.style.borderRadius = '16px';
+// if( data.name === name) {
+//   bubble.style.background = '#dcf8c6'; // WhatsApp green (sender)
+// } else {
+//   bubble.style.background = '#fff'; // Default white for received
+// }
+bubble.style.color = '#111';
+bubble.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+bubble.style.display = 'inline-block';
+bubble.style.fontSize = '14px';
+bubble.style.lineHeight = '1.4';
+bubble.style.wordBreak = 'break-word';
+  bubble.addEventListener('mouseenter', () => 
+bubble.style.transform = 'scale(1.1)');
+  bubble.addEventListener('mouseleave', () => 
+bubble.style.transform = 'scale(1)');
+
+// === Optional: file label ===
+const label = document.createElement('div');
+label.textContent = `📎 ${fileName}`;
+label.style.fontWeight = '500';
+label.style.marginBottom = '6px';
+bubble.appendChild(label);
+
+// === File Preview Container ===
+const preview = document.createElement('div');
+preview.style.marginBottom = '6px';
+
+// === IMAGE ===
+if (/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl)) {
+  const img = document.createElement('img');
+  img.src = fileUrl;
+  img.style.maxWidth = '100%';
+  img.style.borderRadius = '10px';
+  img.style.marginBottom = '6px';
+  img.style.cursor = 'pointer';
+  img.addEventListener('click', () => window.open(fileUrl, '_blank'));
+  preview.appendChild(img);
+}
+
+// === PDF ===
+else if (/\.pdf$/i.test(fileUrl)) {
+  const embed = document.createElement('embed');
+  embed.src = fileUrl;
+  embed.type = 'application/pdf';
+  embed.width = '100%';
+  embed.height = '250px';
+  embed.style.borderRadius = '10px';
+  preview.appendChild(embed);
+}
+
+// === VIDEO ===
+else if (/\.(mp4|webm|ogg)$/i.test(fileUrl)) {
+  const video = document.createElement('video');
+  video.src = fileUrl;
+  video.controls = true;
+  video.style.maxWidth = '100%';
+  video.style.borderRadius = '10px';
+  preview.appendChild(video);
+}
+
+// === AUDIO ===
+else if (/\.(mp3|wav|ogg)$/i.test(fileUrl)) {
+  const audio = document.createElement('audio');
+  audio.src = fileUrl;
+  audio.controls = true;
+  audio.style.width = '100%';
+  preview.appendChild(audio);
+}
+
+// === OTHER FILE TYPES (docx, zip, etc.) ===
+else {
+  const icon = document.createElement('div');
+  icon.textContent = '📄'; // fallback icon
+  icon.style.fontSize = '24px';
+  icon.style.marginBottom = '4px';
+  preview.appendChild(icon);
+}
+
+// === Open/Download Button ===
+const btn = document.createElement('button');
+btn.textContent = 'Open';
+btn.style.background = '#075E54';
+btn.style.color = '#fff';
+btn.style.border = 'none';
+btn.style.borderRadius = '8px';
+btn.style.cursor = 'pointer';
+btn.addEventListener('click', () => window.open(fileUrl, '_blank'));
+ 
+if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl))
+preview.appendChild(btn);
+
+bubble.appendChild(preview);
+
+// === Append to chat container ===
+allMessages.appendChild(bubble);
+
 });
 
 
@@ -227,3 +316,5 @@ socket.on('file', (data) => {
 </script>
 </body>
 </html>
+
+

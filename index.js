@@ -118,18 +118,17 @@ app.post('/login', async (req, res) => {
 
 
 
-app.get('/',requireAuth,(req,res)=>{
-    // res.sendFile('./public/index.html');
-    const user=req.body
-  console.log('req.user in / route:', req.user);
- res.sendFile(path.join(__dirname, 'public', 'Advance.html'), {
-    headers: {
-      'Content-Type': 'text/html',
-      'Set-Cookie': `token=${req.cookies.token}; HttpOnly; Path=/; Max-Age=3600; SameSite=Strict`
-    }
-  });
-   
+app.get('/', requireAuth, (req, res) => {
+  const userName = req.cookies.username;
+
+  if (userName) {
+    return res.redirect(`/Advance.html?name=${encodeURIComponent(userName)}`);
+  }
+
+  // fallback if cookie missing
+  res.redirect('/login');
 });
+
 
 app.post('/',requireAuth,upload.single('profileImage'),async (req,res)=>{
     
