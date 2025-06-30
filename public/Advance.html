@@ -5,13 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatAPP</title>
     <style>
+      
         body{
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column; 
-             /* background-image: url('/background.webp');*/
+             /* background-image: url('/background.webp'); */
               background-color: black
+      }
+      
+      .videobtn{
+        position: absolute;
+        top: 20px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
       }
       textarea,button{
         display: inline;
@@ -91,6 +100,11 @@ input[type="file"] {
 </head>
 <body style="background-color: black;">
     <!-- <h1 style="color: beige;">Chatting  App</h1> -->
+     <!-- 📹 Video Call Button -->
+<button class="videobtn" id="startVideoCallBtn">
+  <img src="video-chat.png" width="60px" height="60px" alt="Video Call">
+</button>
+
     <div class="chatroom">
         <div id="messages"></div>
     </div>
@@ -109,6 +123,13 @@ input[type="file"] {
     </div>    
         <script src="/socket.io/socket.io.js"></script>
         <script>
+          //videocall
+  document.getElementById('startVideoCallBtn').addEventListener('click', () => {
+  // Open your WebRTC video call app in a new tab
+  window.open('https://video-calling-8jks.vercel.app/', '_blank');
+});
+
+
           const chatRoom = document.querySelector('.chatroom');
           function scrollToBottom() {
             chatRoom.scrollTop = chatRoom.scrollHeight; // Scroll to the bottom on load
