@@ -148,28 +148,37 @@ input[type="file"] {
     const sendBtn=document.getElementById('send');
     const allMessages=document.getElementById('messages');
      socket.on('message',(message)=>{
+      const msgBox=document.createElement('div');
         const para=document.createElement('p');
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = message.name + ": ";
         // para.innerText=message.text+" --> "+message.id;
         para.innerText=message.text;
         console.log(message.id);
-        allMessages.appendChild(para);
+        msgBox.appendChild(nameSpan);
+        msgBox.appendChild(para);
         scrollToBottom(); // Scroll to the bottom when a new message is added
-          para.classList.add('message');
-
-      if (message.name === name) {
-      para.classList.add('sent')
-
-    } else {
-      para.classList.add('received');
-    }
-    
-        // para.style.backgroundColor = 'rgb(214, 7, 76)';
+          msgBox.classList.add('message');
+          
+          if (message.name === name) {
+            msgBox.classList.add('sent')
+            
+          } else {
+            msgBox.classList.add('received');
+          }
+          allMessages.appendChild(msgBox);
+          // para.style.backgroundColor = 'rgb(214, 7, 76)';
+          nameSpan.style.fontWeight = 'bold';
+          nameSpan.style.color = 'blue';  
         para.style.color = 'black';
-        para.style.padding = '10px 15px';
-        para.style.borderRadius = '10px';
-        para.style.maxWidth = '70%';
-        para.style.wordWrap = 'break-word';
-        para.style.margin = '10px';
+       msgBox.style.padding = '2px 6px';
+       msgBox.style.borderRadius = '10px';
+       msgBox.style.maxWidth = '40%';
+       msgBox.style.wordWrap = 'break-word';
+       msgBox.style.margin = '10px';
+// Removed or fixed this:
+      msgBox.style.minHeight = 'auto'; // Let it adjust to content height
+
      });
      sendBtn.addEventListener("click",(e)=>{
        const message=messageInput.value.trim();
@@ -249,11 +258,25 @@ bubble.style.transform = 'scale(1.1)');
 bubble.style.transform = 'scale(1)');
 
 // === Optional: file label ===
+const nameSpan = document.createElement('span');
+const labelName = document.createElement('span');  // ✅ Fixed here
 const label = document.createElement('div');
-label.textContent = `📎 ${fileName}`;
+
+nameSpan.textContent = data.name + ": ";
+nameSpan.style.fontWeight = 'bold';
+nameSpan.style.color = 'blue'; // Style for the sender's name
+
+labelName.textContent = `📎 ${fileName}`;
+
 label.style.fontWeight = '500';
 label.style.marginBottom = '6px';
-bubble.appendChild(label);
+
+// Add name and file label to label container
+label.appendChild(nameSpan);
+label.appendChild(labelName);
+
+// Append label to the message bubble
+bubble.appendChild(label); // ✅ Make sure 'bubble' is already defined
 
 // === File Preview Container ===
 const preview = document.createElement('div');
